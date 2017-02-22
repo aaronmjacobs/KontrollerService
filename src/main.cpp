@@ -72,8 +72,7 @@ bool installService(PSTR pszServiceName, PSTR pszDisplayName, PSTR pszDescriptio
    return true;
 }
 
-bool uninstallService(PSTR pszServiceName)
-{
+bool uninstallService(PSTR pszServiceName) {
    // Open the local default service control manager database
    SC_HANDLE schSCManager = OpenSCManager(nullptr, nullptr, SC_MANAGER_CONNECT);
    if (schSCManager == nullptr) {
@@ -83,8 +82,7 @@ bool uninstallService(PSTR pszServiceName)
 
    // Open the service with delete, stop, and query status permissions
    SC_HANDLE schService = OpenService(schSCManager, pszServiceName, SERVICE_STOP | SERVICE_QUERY_STATUS | DELETE);
-   if (schService == nullptr)
-   {
+   if (schService == nullptr) {
       printf("OpenService failed with error: 0x%08lx\n", GetLastError());
       
       CloseServiceHandle(schSCManager);
@@ -93,37 +91,28 @@ bool uninstallService(PSTR pszServiceName)
 
    // Try to stop the service
    SERVICE_STATUS ssSvcStatus = {};
-   if (ControlService(schService, SERVICE_CONTROL_STOP, &ssSvcStatus))
-   {
+   if (ControlService(schService, SERVICE_CONTROL_STOP, &ssSvcStatus)) {
       printf("Stopping %s", pszServiceName);
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-      while (QueryServiceStatus(schService, &ssSvcStatus))
-      {
-         if (ssSvcStatus.dwCurrentState == SERVICE_STOP_PENDING)
-         {
+      while (QueryServiceStatus(schService, &ssSvcStatus)) {
+         if (ssSvcStatus.dwCurrentState == SERVICE_STOP_PENDING) {
             printf(".");
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-         }
-         else
-         {
+         } else {
             break;
          }
       }
 
-      if (ssSvcStatus.dwCurrentState == SERVICE_STOPPED)
-      {
+      if (ssSvcStatus.dwCurrentState == SERVICE_STOPPED) {
          printf("\n%s has been stopped\n", pszServiceName);
-      }
-      else
-      {
+      } else {
          printf("\n%s failed to stop\n", pszServiceName);
       }
    }
 
    // Now remove the service by calling DeleteService.
-   if (!DeleteService(schService))
-   {
+   if (!DeleteService(schService)) {
       printf("DeleteService failed with error: 0x%08lx\n", GetLastError());
       
       CloseServiceHandle(schSCManager);
@@ -142,8 +131,7 @@ bool uninstallService(PSTR pszServiceName)
 } // namespace
 
 void WINAPI serviceControlHandler(DWORD dwCtrl) {
-   switch (dwCtrl)
-   {
+   switch (dwCtrl) {
    case SERVICE_CONTROL_STOP: kontrollerService.onStop(); break;
    case SERVICE_CONTROL_PAUSE: break;
    case SERVICE_CONTROL_CONTINUE: break;
@@ -153,11 +141,9 @@ void WINAPI serviceControlHandler(DWORD dwCtrl) {
    }
 }
 
-VOID WINAPI ServiceMain(DWORD dwArgc, LPSTR *lpszArgv)
-{
+VOID WINAPI ServiceMain(DWORD dwArgc, LPSTR *lpszArgv) {
    SERVICE_STATUS_HANDLE handle = RegisterServiceCtrlHandler(kServiceName, serviceControlHandler);
-   if (!handle)
-   {
+   if (!handle) {
       fprintf(stderr, "RegisterServiceCtrlHandler failed\n");
       return;
    }
