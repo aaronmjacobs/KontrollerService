@@ -1,0 +1,3 @@
+[submodule "lib/KontrollerSock"]
+	path = lib/KontrollerSock
+	url = https://github.com/aaronmjacobs/KontrollerSock.git
