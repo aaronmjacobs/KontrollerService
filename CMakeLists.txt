@@ -5,6 +5,7 @@ project(KontrollerService VERSION 0.0.0 LANGUAGES CXX)
 # Directories
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/binaries")
 
 # Source files
 set(SOURCES)
@@ -29,3 +30,10 @@ set(KONTROLLER_SOCK_DIR "${LIB_DIR}/KontrollerSock")
 add_subdirectory("${KONTROLLER_SOCK_DIR}")
 target_include_directories(${PROJECT_NAME} PRIVATE $<TARGET_PROPERTY:KontrollerServer,INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(${PROJECT_NAME} "KontrollerServer")
+
+# Install
+install(TARGETS ${PROJECT_NAME}
+   DESTINATION "${BIN_DIR}"
+   PERMISSIONS OWNER_EXECUTE
+   CONFIGURATIONS Release
+)
