@@ -34,7 +34,7 @@ bool installService(PSTR pszServiceName, PSTR pszDisplayName, PSTR pszDescriptio
    }
 
    // Install the service into SCM by calling CreateService
-   DWORD access = SERVICE_QUERY_STATUS | SERVICE_CHANGE_CONFIG;
+   DWORD access = SERVICE_QUERY_STATUS | SERVICE_CHANGE_CONFIG | SERVICE_START;
    SC_HANDLE schService = CreateService(
       schSCManager,                   // SCManager database
       pszServiceName,                 // Name of service
@@ -65,6 +65,12 @@ bool installService(PSTR pszServiceName, PSTR pszDisplayName, PSTR pszDescriptio
    }
 
    printf("%s has been installed\n", pszServiceName);
+
+   if (StartService(schService, 0, nullptr)) {
+      printf("%s has been started\n", pszServiceName);
+   } else {
+      printf("StartService failed with error 0x%08lx\n", GetLastError());
+   }
 
    CloseServiceHandle(schSCManager);
    CloseServiceHandle(schService);
